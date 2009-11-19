@@ -1,4 +1,9 @@
 #define DEBUG 0
+#define DISPLAY_IMAGES 0
+#define WRITE_OUT_IMAGE 1
+#define DO_CANNY_EDGE_DETECTION 1
+#define THRESHOLD_VAL 0.79
+
 #include <cv.h>
 #include <cxcore.h>
 #include <highgui.h>
@@ -216,13 +221,10 @@ int main(int argc, char** argv){
     return(-1);
   }
 
-  // load marked up output images too
-  for(i = 0; i < 6; ++i){
-    //if ( (src_marked_up = cvCreateImage( cvGetSize(src), 8, 1 ) ) == 0){
-    if((src_marked_up=cvLoadImage(src_fn, CV_LOAD_IMAGE_COLOR ))== 0) {
-      printf("Error reading template image file '%s' into marked up output file (iteration %i)\n",src_fn, i); 
-      return(-1);
-    }
+  // load up another copy of src that we can mark up
+  if((src_marked_up=cvLoadImage(src_fn, CV_LOAD_IMAGE_COLOR ))== 0) {
+    printf("Error reading template image file '%s' into marked up output file (iteration %i)\n",src_fn, i); 
+    return(-1);
   }
 
   //////////////////////////////////////////////
@@ -251,9 +253,11 @@ int main(int argc, char** argv){
   //////////////////////////////////////////
   //cvCanny( fling, wibbit, 50, 200, 3 ); // default parameters, produces a lot of noise
   //cvCanny( fling, wibbit, 50, 900, 3 ); // these seem to exclude a lot of crap
-  
-  //cvCanny( src, src, 50, 200, 3 );
-  //cvCanny( templ, templ, 50, 200, 3 );
+
+#if DO_CANNY_EDGE_DETECTION
+  cvCanny( src, src, 50, 200, 3 );
+  cvCanny( templ, templ, 50, 200, 3 );
+#endif
   
   //////////////////////////////////////////
   // Do the actual matching
@@ -281,23 +285,25 @@ int main(int argc, char** argv){
 #endif
   
   //mark_best_hit( src_marked_up, match_matrix );
-  mark_best_hits_by_threshold( src_marked_up, match_matrix, 0.7 );
+  mark_best_hits_by_threshold( src_marked_up, match_matrix, THRESHOLD_VAL );
   
   // Display results
 
+#if DISPLAY_IMAGES
   display_image( templ, "templ");
   display_image( src, "src");
   display_image( match_matrix, "test_matrix");
   display_image( src_marked_up, "src_marked_up");
-
-  
-  char output_winname [50];
-  sprintf (output_winname, "%s_marked_up_iteration-%i.jpg", src_fn, i);
-
   cvWaitKey(0);
-
-  write_image_file( src_marked_up, output_winname );
+#endif
   
+  char output_winname[(int) strlen(src_fn)];
+  sprintf (output_winname, "%s_marked_up.jpg", src_fn );
+
+#if WRITE_OUT_IMAGE
+  write_image_file( src_marked_up, output_winname );
+#endif
+
   cvReleaseImage(&src);
   cvReleaseImage(&templ);
   cvReleaseImage(&match_matrix);

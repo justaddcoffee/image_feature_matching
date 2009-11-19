@@ -1,6 +1,6 @@
 CC=g++ # or gcc
-CFLAGS=-ggdb -Wall 
-LDFLAGS=-I /usr/local/include/opencv -lcxcore -lcv -lhighgui -lcvaux -lml
+CFLAGS=
+LDFLAGS=-ggdb -Wall -I /usr/local/include/opencv -lcxcore -lcv -lhighgui -lcvaux -lml
 SOURCES=template_matching.c
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=template_matching
