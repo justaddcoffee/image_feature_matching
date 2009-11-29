@@ -1,18 +1,33 @@
 CC=g++ # or gcc
 CFLAGS=
 LDFLAGS=-ggdb -Wall -I /usr/local/include/opencv -lcxcore -lcv -lhighgui -lcvaux -lml
-SOURCES=template_matching.c
-OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=template_matching
 
-all: $(SOURCES) $(EXECUTABLE)
+SOURCES_TEMPLATE_MATCHING=template_matching.c
+SOURCES_TEMPLATE_MATCHING_WTB=template_matching_with_trackbar.c
+SOURCES_CONTOUR=contour.c
 
-$(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+OBJECTS_TEMPLATE_MATCHING=$(SOURCES_TEMPLATE_MATCHING:.cpp=.o)
+OBJECTS_TEMPLATE_MATCHING_WTB=$(SOURCES_TEMPLATE_MATCHING_WTB:.cpp=.o)
+OBJECTS_CONTOUR=$(SOURCES_CONTOUR:.cpp=.o)
+
+EXECUTABLE_TEMPLATE_MATCHING=template_matching
+EXECUTABLE_TEMPLATE_MATCHING_WTB=template_matching_with_trackbar
+EXECUTABLE_CONTOUR=contour
+
+all: $(SOURCES_TEMPLATE_MATCHING) $(EXECUTABLE_TEMPLATE_MATCHING) $(SOURCES_TEMPLATE_MATCHING_WTB) $(EXECUTABLE_TEMPLATE_MATCHING_WTB) $(SOURCES_CONTOUR) $(EXECUTABLE_CONTOUR) 
+
+$(EXECUTABLE_TEMPLATE_MATCHING):
+	$(CC) $(LDFLAGS) $(OBJECTS_TEMPLATE_MATCHING) -o $@
+
+$(EXECUTABLE_TEMPLATE_MATCHING_WTB):
+	$(CC) $(LDFLAGS) $(OBJECTS_TEMPLATE_MATCHING_WTB) -o $@
+
+$(EXECUTABLE_CONTOUR):
+	$(CC) $(LDFLAGS) $(OBJECTS_CONTOUR) -o $@
 
 clean:
-	rm -rf *o template_matching template_matching.dSYM
+	rm -rf *.dSYM *o $(EXECUTABLE_TEMPLATE_MATCHING) $(EXECUTABLE_TEMPLATE_MATCHING_WTB) $(EXECUTABLE_CONTOUR)
 
 test:
-	./template_matching test_images/palm_7R_1_4.jpg test_images/palm_7R.jpg
+	./$(EXECUTABLE_TEMPLATE_MATCHING) test_images/palm_7R_1_4.jpg test_images/palm_7R.jpg && ./$(EXECUTABLE_TEMPLATE_MATCHING_WTB) test_images/palm_7R_1_4.jpg test_images/palm_7R.jpg
 
