@@ -1,8 +1,8 @@
 #define DEBUG 0
-#define DISPLAY_IMAGES 0
+#define DISPLAY_IMAGES 1
 #define WRITE_OUT_IMAGE 1
 #define DO_CANNY_EDGE_DETECTION 1
-#define THRESHOLD_VAL 0.79
+#define THRESHOLD_VAL 0.3
 
 #include <cv.h>
 #include <cxcore.h>
