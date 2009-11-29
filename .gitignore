@@ -1,5 +1,8 @@
 *~
 contour
+contour.dSYM/
 template_matching
 template_matching.dSYM/
+template_matching_with_trackbar
+template_matching_with_trackbar.dSYM/
 test_images/palm_7R.jpg_marked_up_iteration-6.jpg
