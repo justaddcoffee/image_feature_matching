@@ -29,7 +29,7 @@ int main(int argc, char** argv){
   src_fn = argv[2];
   threshold = atof(argv[3]);
 
-  printf("\"image\":\"%s\",\"query_image:\":\"%s\",", templ_fn, src_fn);
+  printf("\"image\":\"%s\",\"query_image\":\"%s\",", templ_fn, src_fn);
 
   //Read in the template to be used for matching:
   if((templ=cvLoadImage(templ_fn, CV_LOAD_IMAGE_GRAYSCALE ))== 0) {
