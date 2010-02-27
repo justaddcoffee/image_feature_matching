@@ -82,7 +82,6 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
 #endif
 
     if ( count > max_matches - 1 ){
-      //      fprintf(stderr, "\"error\": \"exceeded maximum hits (%d), I'm going to stop looking for more matches\"}", max_matches ); 
       printf("], \"error\": \"exceeded maximum hits (%d), I'm going to stop looking for more matches\"}", max_matches ); 
       exit(1);
       break;
