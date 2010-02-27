@@ -21,7 +21,7 @@ int main(int argc, char** argv){
 
   if (argc != 4){
     printf("\"error\":\"wrong number of arguments (%d instead of 4) given on command line\"}", argc );
-    exit(-42);
+    exit(-1);
   }
 
   templ_fn = argv[1];
@@ -32,14 +32,14 @@ int main(int argc, char** argv){
 
   //Read in the template to be used for matching:
   if((templ=cvLoadImage(templ_fn, CV_LOAD_IMAGE_GRAYSCALE ))== 0) {
-    printf("\"error\": \"Error on reading image %s\"}", src_fn ); 
-    return(-1);
+    printf("\"error\":\"Error on reading image %s\"}", src_fn ); 
+    exit(-1);
   }
 
   //Read in the source image to be searched:
   if((src=cvLoadImage(src_fn, CV_LOAD_IMAGE_GRAYSCALE ))== 0) {
-    printf("\"error\": \"Error on reading query image %s\"}", templ_fn ); 
-    return(-1);
+    printf("\"error\":\"Error on reading query image %s\"}", templ_fn ); 
+    exit(-1);
   }
 
   // make match matrix
@@ -57,7 +57,7 @@ int main(int argc, char** argv){
   cvReleaseImage(&match_matrix);
   cvReleaseImage(&src_marked_up);
 
-  return 0;
+  return 1;
 
 }
 
@@ -83,7 +83,7 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
 
     if ( count > max_matches - 1 ){
       printf("], \"error\": \"exceeded maximum hits (%d), I'm going to stop looking for more matches\"}", max_matches ); 
-      exit(1);
+      exit(-1);
       break;
     }
     count++;
@@ -103,16 +103,6 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
     printf("[%d,%d,%d,%d,%5.2f],",
 	   pt_upper_left.x, pt_upper_left.y, pt_lower_right.x, pt_lower_right.y, get_matrix_max( match_matrix ));
     
-    //  void cvRectangle(CvArr* img, CvPoint pt1, CvPoint pt2, CvScalar color, int thickness=1, int line_type=8, int shift=0
-    cvRectangle( image,
-		 pt_upper_left, 
-		 pt_lower_right, 
-		 CV_RGB(255,50,50), 
-		 2,
-		 8,
-		 0
-		 );
-
     // now zero out current max
     // blot out square around peak too
     CvScalar s; // so strange
