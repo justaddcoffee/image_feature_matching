@@ -10,7 +10,6 @@ const int max_matches = 2000;
 double get_matrix_max( IplImage *match_matrix );
 int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double threshold );
 int check_min_max( IplImage *match_matrix );
-int print_match_info_in_json( CvPoint *pt_upper_left, CvPoint *pt_lower_right, float norm_match_score);
 
 int main(int argc, char** argv){
 
@@ -102,7 +101,6 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
     pt_lower_right.x += add_to_x;
     pt_lower_right.y += add_to_y;
 
-    //    print_match_info_in_json( &pt_upper_left, &pt_lower_right, get_matrix_max( match_matrix ) );
     printf("[%d,%d,%d,%d,%5.2f],",
 	   pt_upper_left.x, pt_upper_left.y, pt_lower_right.x, pt_lower_right.y, get_matrix_max( match_matrix ));
     
@@ -149,8 +147,6 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
 
   } while ( get_matrix_max( match_matrix ) > threshold );
 
-  cvReleaseImage(&match_matrix);
-
   return 1;
     
 }
@@ -193,8 +189,3 @@ int check_min_max( IplImage *match_matrix ){ // method just to see what kinds of
   
 }
 
-int print_match_info_in_json( CvPoint *pt_upper_left, CvPoint *pt_lower_right, float norm_match_score){
-
-  return 1;
-
-}
