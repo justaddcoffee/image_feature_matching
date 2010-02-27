@@ -20,7 +20,7 @@ int main(int argc, char** argv){
   printf("{");
 
   if (argc != 4){
-    printf("\"error\": \"wrong number of arguments (%d) given on command line\"}", argc );
+    printf("\"error\":\"wrong number of arguments (%d instead of 4) given on command line\"}", argc );
     exit(-42);
   }
 
@@ -88,7 +88,7 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
     }
     count++;
 
-    // write rectangle around new max
+    // find mix/max
     double minVal, maxVal;
     CvPoint minLoc, maxLoc;
     cvMinMaxLoc( match_matrix, &minVal, &maxVal, &minLoc, &maxLoc, NULL);
