@@ -50,14 +50,12 @@ int main(int argc, char** argv){
   cvMatchTemplate( src, templ, match_matrix, CV_TM_CCOEFF_NORMED);
   printf("\"matches\":[");
   mark_best_hits_by_threshold( src, match_matrix, threshold);
-  printf("]");
+  printf("]}"); // close json
 
   cvReleaseImage(&src);
   cvReleaseImage(&templ);
   cvReleaseImage(&match_matrix);
   cvReleaseImage(&src_marked_up);
-
-  printf("}");
 
   return 0;
 
@@ -66,7 +64,7 @@ int main(int argc, char** argv){
 int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double threshold ){
 
 #if DEBUG
-  printf("in mark_best_hits_by_threshold");
+  fprintf(stderr, "in mark_best_hits_by_threshold");
   check_min_max( match_matrix );
 #endif
 
@@ -80,11 +78,13 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
   do { // do loop once, then check if max value is gt threshold on each subsequent loop
 
 #if DEBUG
-    printf("max of match_matrix is now %lf\n", get_matrix_max( match_matrix ) );
+    fprintf(stderr, "max of match_matrix is now %lf\n", get_matrix_max( match_matrix ) );
 #endif
 
     if ( count > max_matches - 1 ){
-      printf("\"error\": \"exceeded maximum hits (%d), I'm going to stop looking for more matches\"}", max_matches ); 
+      //      fprintf(stderr, "\"error\": \"exceeded maximum hits (%d), I'm going to stop looking for more matches\"}", max_matches ); 
+      printf("], \"error\": \"exceeded maximum hits (%d), I'm going to stop looking for more matches\"}", max_matches ); 
+      exit(1);
       break;
     }
     count++;
@@ -119,21 +119,21 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
     CvScalar s; // so strange
 #if DEBUG
     s=cvGet2D(match_matrix, maxLoc.y, maxLoc.x);
-    printf("resetting element %i, %i, which is %f\n", maxLoc.x, maxLoc.y, s.val[0] );
+    fprintf(stderr, "resetting element %i, %i, which is %f\n", maxLoc.x, maxLoc.y, s.val[0] );
 #endif
     s.val[0]=0.0;
     s.val[1]=0.0;
     s.val[2]=0.0;
 
-    int blot_square_size = 5; 
+    int blot_square_size = 5;  // how many pixels around local max to blot out after noting local max
     int i, j;
     for ( i = - (blot_square_size); i < blot_square_size; i++){
       for ( j = - (blot_square_size); j < blot_square_size; j++){
 
 #if DEBUG
-	printf("counters %i, %i\n", i, j );
-	printf("col %i row %i\n", (maxLoc.y + i),  (maxLoc.x + j)  );
-	printf("(height %i, width %i\n", match_matrix->height, match_matrix->width);
+	fprintf(stderr, "counters %i, %i\n", i, j );
+	fprintf(stderr, "col %i row %i\n", (maxLoc.y + i),  (maxLoc.x + j)  );
+	fprintf(stderr, "(height %i, width %i\n", match_matrix->height, match_matrix->width);
 #endif
 	if ( (maxLoc.y + i) < 0 || (maxLoc.x + j) < 0 || 
 	     (maxLoc.y + i) > match_matrix->height - 1 || (maxLoc.x + j) > match_matrix->width - 1
@@ -179,7 +179,7 @@ int check_min_max( IplImage *match_matrix ){ // method just to see what kinds of
 	       &maxLoc,
 	       NULL);
   
-  printf("found min (%5.2f ) at %i, %i and max (%5.2f ) at %i, %i\n", 
+  fprintf(stderr, "found min (%5.2f ) at %i, %i and max (%5.2f ) at %i, %i\n", 
 	 minVal, (int) minLoc.x, (int) minLoc.y,
 	 maxVal, (int) maxLoc.x, (int) maxLoc.y
 	 );
