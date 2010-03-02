@@ -33,13 +33,13 @@ int main(int argc, char** argv){
 
   //Read in the template to be used for matching:
   if((templ=cvLoadImage(templ_fn, CV_LOAD_IMAGE_GRAYSCALE ))== 0) {
-    printf("\"error\":\"Error on reading image %s\"}", src_fn ); 
+    printf("\"error\":\"Error on reading image %s\"}", templ_fn ); 
     exit(-1);
   }
 
   //Read in the source image to be searched:
   if((src=cvLoadImage(src_fn, CV_LOAD_IMAGE_GRAYSCALE ))== 0) {
-    printf("\"error\":\"Error on reading query image %s\"}", templ_fn ); 
+    printf("\"error\":\"Error on reading query image %s\"}", src_fn ); 
     exit(-1);
   }
 
