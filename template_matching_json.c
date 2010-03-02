@@ -3,9 +3,10 @@
 #include <highgui.h>
 #include <stdio.h>
 
-IplImage *src, *templ, *match_matrix, *src_marked_up;
+#define MAX_MATCHES 2000 // maximum number of hits to look for in target image
+#define BLOT_PIXELS 5 // how many pixels around local max to blot out after noting local max
 
-const int max_matches = 2000;
+IplImage *src, *templ, *match_matrix, *src_marked_up;
 
 double get_matrix_max( IplImage *match_matrix );
 int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double threshold );
@@ -81,8 +82,8 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
     fprintf(stderr, "max of match_matrix is now %lf\n", get_matrix_max( match_matrix ) );
 #endif
 
-    if ( count > max_matches - 1 ){
-      printf("], \"error\": \"exceeded maximum hits (%d), I'm going to stop looking for more matches\"}", max_matches ); 
+    if ( count > MAX_MATCHES - 1 ){
+      printf("], \"error\": \"exceeded maximum hits (%d), I'm going to stop looking for more matches\"}", MAX_MATCHES ); 
       exit(-1);
       break;
     }
@@ -114,10 +115,9 @@ int mark_best_hits_by_threshold( IplImage *image, IplImage *match_matrix, double
     s.val[1]=0.0;
     s.val[2]=0.0;
 
-    int blot_square_size = 5;  // how many pixels around local max to blot out after noting local max
     int i, j;
-    for ( i = - (blot_square_size); i < blot_square_size; i++){
-      for ( j = - (blot_square_size); j < blot_square_size; j++){
+    for ( i = - (BLOT_PIXELS); i < BLOT_PIXELS; i++){
+      for ( j = - (BLOT_PIXELS); j < BLOT_PIXELS; j++){
 
 #if DEBUG
 	fprintf(stderr, "counters %i, %i\n", i, j );
