@@ -32,7 +32,6 @@ void on_trackbar(int){
 	cvShowImage( "Contours", g_gray );
 }
 
-
 int main(int argc, char** argv)
 {
 
@@ -47,6 +46,9 @@ int main(int argc, char** argv)
     printf("Error reading template image file '%s'\n", file_name); 
     return(-1);
   }
+
+  cvNamedWindow( "Original", 1);
+  cvShowImage( "Original", g_image );
 
   cvNamedWindow( "Contours", 1 );
   cvCreateTrackbar( "Threshold", "Contours", &g_thresh, 255, on_trackbar );

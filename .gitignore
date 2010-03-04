@@ -9,3 +9,5 @@ template_matching_json
 template_matching_json.dSYM/
 test_images/palm_7R.jpg_marked_up.jpg
 test_images/*_marked_up_*.jpg
+extract_contours.dSYM
+extract_contours

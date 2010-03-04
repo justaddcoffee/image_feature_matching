@@ -62,9 +62,10 @@ int main(int argc, char** argv){
   // convert to grayscale
   cvCvtColor( image_original, image_manip, CV_BGR2GRAY );
 
-  // apply binary threshold
-  //cvThreshold( image_manip, image_manip, threshold, 255, THRESHOLD_TYPE );
-  cvAdaptiveThreshold(image_manip, image_manip, 255, ADAPTIVE_METHOD, THRESHOLD_TYPE, BLOCK_SIZE, SUBTRACT_PARAM);
+  // make contour-ready image using thresholding or canny edge detection 
+  cvThreshold( image_manip, image_manip, threshold, 255, THRESHOLD_TYPE );
+  //cvAdaptiveThreshold(image_manip, image_manip, 255, ADAPTIVE_METHOD, THRESHOLD_TYPE, BLOCK_SIZE, SUBTRACT_PARAM);
+  //cvCanny( image_manip, image_manip, 50, 900, 3 ); // these seem to exclude a lot of crap
 
   #if DEBUG
      cvNamedWindow( "Thresholded", 1);
