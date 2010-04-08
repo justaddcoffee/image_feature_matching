@@ -26,7 +26,6 @@ Problems:
 
 // standard opencv stuff
 #include <cv.h>
-#include <cxcore.h>
 #include <highgui.h>
 #include <stdio.h>
 

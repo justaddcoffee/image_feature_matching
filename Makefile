@@ -1,6 +1,6 @@
 CC= g++-4.0 # or gcc-4.0
 CFLAGS=
-LDFLAGS=-ggdb -Wall -I /usr/local/include/ -lcxcore.2.0 -lcv.2.0 -lhighgui.2.0 -lcvaux.2.0 -lml
+LDFLAGS=-ggdb -Wall -I /usr/local/include/ -I ./include -lcxcore.2.0 -lcv.2.0 -lhighgui.2.0 -lcvaux.2.0 -lml 
 
 SOURCES_TEMPLATE_MATCHING=template_matching.c
 SOURCES_TEMPLATE_MATCHING_JSON=template_matching_json.c

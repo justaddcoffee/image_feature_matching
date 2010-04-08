@@ -5,7 +5,6 @@
 #define THRESHOLD_VAL 0.3
 
 #include <cv.h>
-#include <cxcore.h>
 #include <highgui.h>
 #include <stdio.h>
 
