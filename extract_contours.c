@@ -1,7 +1,7 @@
 /*
 Given an image file (and possibly a threshold?), extract all contours and write to an image file
 
-./extract_contours image_file 
+./extract_contours image_file 1|2|3
 
 writes out 
    image_file_contours_1

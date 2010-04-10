@@ -39,8 +39,6 @@ int write_image_file( IplImage *image_to_write, char *file_name ){
 
 }
 
-
-
 height_width_values get_max_x_y_for_contour_set( CvSeq* contours ){
 
   // get maximum x and y contour size, make then make image of size (# contours * max X length) by (# contours * max Y length)

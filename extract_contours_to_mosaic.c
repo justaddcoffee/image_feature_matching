@@ -15,6 +15,10 @@ Problems:
 #define THRESHOLD_TYPE CV_THRESH_BINARY
 // CV_THRESH_BINARY or CV_THRESH_BINARY_INV
 
+// these are minimum sizes (for both length and width)
+#define MIN_CONTOUR_PIXEL_SIZE 3
+#define MAX_CONTOUR_PIXEL_SIZE 60
+
 //////////////////////////////////////
 //these are for adaptive thresholding
 //////////////////////////////////////
@@ -148,9 +152,6 @@ int main(int argc, char** argv){
     fflush(stdout);
 #endif    
 
-    if ( n == 520 ){
-      printf("disco: %i ", n);
-    }
     // set ROI in mosaic_of_contours
     // first, what col are we in? 
     int this_col = n % num_rows_columns;
@@ -169,6 +170,15 @@ int main(int argc, char** argv){
     pt_lower_right.y = bbs.y;
     pt_upper_left.x = pt_lower_right.x + bbs.width;
     pt_upper_left.y = pt_lower_right.y + bbs.height;
+
+    if  (
+	 bbs.width < MIN_CONTOUR_PIXEL_SIZE || bbs.height < MIN_CONTOUR_PIXEL_SIZE  // too small
+	 ||
+	 bbs.width > MAX_CONTOUR_PIXEL_SIZE || bbs.height > MAX_CONTOUR_PIXEL_SIZE // too big
+	 ){
+	 printf("rejected contour of size %i by %i\n", bbs.width, bbs.height);
+	 continue;
+    }
 
     IplImage* extracted_contour;
     extracted_contour = CopySubImage( image_bw_copy, bbs.x, bbs.y, bbs.width, bbs.height);
