@@ -1,15 +1,11 @@
 *~
+*.dSYM
 contour
-contour.dSYM/
 template_matching
-template_matching.dSYM/
 template_matching_with_trackbar
-template_matching_with_trackbar.dSYM/
 template_matching_json
-template_matching_json.dSYM/
 test_images/palm_7R.jpg_marked_up.jpg
 test_images/*_marked_up_*.jpg
 extract_contours.dSYM
 extract_contours
 extract_contours_to_mosaic
-extract_contours_to_mosaic.dSYM
