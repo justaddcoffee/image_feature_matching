@@ -7,7 +7,7 @@ struct height_width_values { // just a struct to hold and x and y (this is curre
 
 IplImage *CopySubImage(IplImage *full_image,int x_top_left, int y_top_left, int width, int height);
 int write_image_file( IplImage *image_to_write, char *file_name );
-height_width_values get_max_x_y_for_contour_set( CvSeq* contours );
+height_width_values get_max_x_y_for_contour_set( CvSeq* contours, int min, int max );
 
 IplImage *CopySubImage(IplImage *full_image,int x_top_left, int y_top_left, int width, int height) {
 
@@ -39,7 +39,7 @@ int write_image_file( IplImage *image_to_write, char *file_name ){
 
 }
 
-height_width_values get_max_x_y_for_contour_set( CvSeq* contours ){
+height_width_values get_max_x_y_for_contour_set( CvSeq* contours, int min, int max ){
 
   // get maximum x and y contour size, make then make image of size (# contours * max X length) by (# contours * max Y length)
   height_width_values max_height_width;
@@ -47,6 +47,25 @@ height_width_values get_max_x_y_for_contour_set( CvSeq* contours ){
   max_height_width.height = 0;
   max_height_width.count = 0;
   for( CvSeq* c=contours; c != NULL; c = c->h_next ) {
+
+    // get contour image
+    CvRect bbs;
+    CvPoint pt_upper_left, pt_lower_right;
+    bbs = cvBoundingRect(c);
+    pt_lower_right.x = bbs.x;
+    pt_lower_right.y = bbs.y;
+    pt_upper_left.x = pt_lower_right.x + bbs.width;
+    pt_upper_left.y = pt_lower_right.y + bbs.height;
+
+    if  (
+	 bbs.width < min || bbs.height < min  // too small
+	 ||
+	 bbs.width > max || bbs.height > max // too big
+	 ){
+	 printf("rejected contour of size %i by %i\n", bbs.width, bbs.height);
+	 continue;
+    }
+
     max_height_width.count++;
 
     CvRect bounding_box;    

@@ -9,3 +9,4 @@ test_images/*_marked_up_*.jpg
 extract_contours.dSYM
 extract_contours
 extract_contours_to_mosaic
+TEST_COMPARE_THREE_ALGORITHMS/images/*contour.jpg'

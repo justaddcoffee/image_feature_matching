@@ -133,7 +133,7 @@ int main(int argc, char** argv){
   // - make the each contour subimage x by x pixels, where x is the max of (width of the widest contour, length of the longest contour)
   // - then make the big image i columns by i rows of subimages, where i = ceil( sqrt( num of contours ) )
 
-  height_width_values max_x_y = get_max_x_y_for_contour_set( contours );
+  height_width_values max_x_y = get_max_x_y_for_contour_set( contours, MIN_CONTOUR_PIXEL_SIZE, MAX_CONTOUR_PIXEL_SIZE  );
   int subimage_dimension = fmax( max_x_y.width, max_x_y.height); // "x" above
   int num_rows_columns = ceil( sqrt( max_x_y.count )); // "i" above
 
@@ -143,6 +143,7 @@ int main(int argc, char** argv){
 						      (subimage_dimension * num_rows_columns) // height
 						      ), 
 					       8, 1);
+  cvZero( mosaic_of_contours );
 
   int n=0; 
   for( CvSeq* c=contours; c != NULL; c = c->h_next ) {
