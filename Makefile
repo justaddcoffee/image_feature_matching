@@ -41,5 +41,5 @@ clean:
 	rm -rf *.dSYM *o $(EXECUTABLE_TEMPLATE_MATCHING) $(EXECUTABLE_TEMPLATE_MATCHING_WTB) $(EXECUTABLE_TEMPLATE_MATCHING_JSON) $(EXECUTABLE_EXTRACT_CONTOURS) $(EXECUTABLE_EXTRACT_CONTOURS_TO_MOSAIC)
 
 test:
-	./$(EXECUTABLE_TEMPLATE_MATCHING) test_images/palm_7R_1_4.jpg test_images/palm_7R.jpg && ./$(EXECUTABLE_TEMPLATE_MATCHING_WTB) test_images/palm_7R_1_4.jpg test_images/palm_7R.jpg && ./$(EXECUTABLE_TEMPLATE_MATCHING_JSON) test_images/palm_7R_1_4.jpg test_images/palm_7R.jpg 0.6 && $(EXECUTABLE_EXTRACT_CONTOURS) test_images/letter_b.png && $(EXECUTABLE_EXTRACT_CONTOURS_TO_MOSAIC) test_images/palm_7R.jpg 1
+	./$(EXECUTABLE_TEMPLATE_MATCHING) test_images/palm_7R_1_4.jpg test_images/palm_7R.jpg && ./$(EXECUTABLE_TEMPLATE_MATCHING_WTB) test_images/palm_7R_1_4.jpg test_images/palm_7R.jpg && ./$(EXECUTABLE_TEMPLATE_MATCHING_JSON) test_images/palm_7R_1_4.jpg test_images/palm_7R.jpg 0.6 && ./$(EXECUTABLE_EXTRACT_CONTOURS) test_images/letter_b.png && ./$(EXECUTABLE_EXTRACT_CONTOURS_TO_MOSAIC) test_images/palm_7R.jpg 1
 

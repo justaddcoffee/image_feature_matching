@@ -115,14 +115,26 @@ int main(int argc, char** argv){
     
   int numContoursFound = 0;
   //cvFindContours( src, storage, &contour, sizeof(CvContour), CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
-  numContoursFound = cvFindContours( 
-				 image_manip, 
-				 contour_storage, 
-				 &contours,
-				 sizeof(CvContour),
-				 CV_RETR_CCOMP,
-				 CV_CHAIN_APPROX_SIMPLE //CV_CHAIN_APPROX_SIMPLE //CV_CHAIN_CODE
-				  );
+
+  if ( edge_method == 3 ){
+    numContoursFound = cvFindContours( 
+				      image_manip, 
+				      contour_storage, 
+				      &contours,
+				      sizeof(CvContour),
+				      CV_RETR_LIST, // If we use adaptive threshold, we'll need to flatten into a list
+				      CV_CHAIN_APPROX_SIMPLE //CV_CHAIN_APPROX_SIMPLE //CV_CHAIN_CODE
+				       );
+  }else{
+    numContoursFound = cvFindContours( 
+				      image_manip, 
+				      contour_storage, 
+				      &contours,
+				      sizeof(CvContour),
+				      CV_RETR_CCOMP, // If we're using canny or threshold, ccomp works fine
+				      CV_CHAIN_APPROX_SIMPLE //CV_CHAIN_APPROX_SIMPLE //CV_CHAIN_CODE
+				       );
+  }
 
   fprintf(stderr, "Found %i contours in image file '%s'\n", numContoursFound, file_name); 
 
