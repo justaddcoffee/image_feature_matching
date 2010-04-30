@@ -13,3 +13,4 @@ TEST_COMPARE_THREE_ALGORITHMS/images/*contour.jpg'
 test_images/letter_b.png_contour_0.jpg
 test_images/letter_b.png_contour_1.jpg
 test_images/palm_7R.jpg_method1_contour.jpg
+test_contour_length
