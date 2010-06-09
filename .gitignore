@@ -9,6 +9,7 @@ test_images/*_marked_up_*.jpg
 extract_contours.dSYM
 extract_contours
 extract_contours_to_mosaic
+match_with_hu_moments
 TEST_COMPARE_THREE_ALGORITHMS/images/*contour.jpg'
 test_images/letter_b.png_contour_0.jpg
 test_images/letter_b.png_contour_1.jpg
