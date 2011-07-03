@@ -91,3 +91,18 @@ height_width_values get_max_x_y_for_contour_set( CvSeq* contours, int min, int m
 
 }
 
+double pghMatchShapes(CvSeq *shape1, CvSeq *shape2) {
+  int dims[] = {8, 8};
+  float range[] = {-180, 180, -100, 100};
+  float *ranges[] = {&range[0], &range[2]};
+  CvHistogram* hist1 = cvCreateHist(2, dims, CV_HIST_ARRAY, ranges, 1);
+  CvHistogram* hist2 = cvCreateHist(2, dims, CV_HIST_ARRAY, ranges, 1);
+  cvCalcPGH(shape1, hist1);
+  cvCalcPGH(shape2, hist2);
+  cvNormalizeHist(hist1, 100.0f);
+  cvNormalizeHist(hist2, 100.0f);
+  double corr = cvCompareHist(hist1, hist2, CV_COMP_BHATTACHARYYA);
+  cvReleaseHist(&hist1);
+  cvReleaseHist(&hist2);
+  return corr;
+}
