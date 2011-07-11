@@ -1,23 +1,30 @@
 /*
-Given an image file (and possibly a threshold?), extract all contours and write to an image file 
-
-./compare_contours image_file [1 = canny|2 = threshold|3 = adaptive]
-
-writes out a single image file with all the contours written out into it
+Given an image file (and possibly a threshold?), extract all contours and write out an image file
+containing a comparison 
+    ./compare_contours image_file
 
 Problems: 
+- Dies when pictures has more than 3-4 contours, gotta sort this out
 - OpenCV doesn't seem to support bounding boxes for Freeman Chain-type contours, which I think we'll need to use. Might need to compute bounding box manually? (Why doesn't OpenCV support this?)
-
 */
 
-#define DEBUG 0
+#define DEBUG 1
 #define DEBUG_BBS 0
 #define THRESHOLD_TYPE CV_THRESH_BINARY
 // CV_THRESH_BINARY or CV_THRESH_BINARY_INV
 
+// maximum number of rows contour pairs and scores to show, so we don't end up with an image with 8 gagillion rows
+#define MAX_CONTOUR_COMPARISONS 500 
+
 // these are minimum sizes (for both length and width)
 #define MIN_CONTOUR_PIXEL_SIZE 3
 #define MAX_CONTOUR_PIXEL_SIZE 60
+
+// these are just to make the results more managable, not probably for use in final algorithm
+#define MIN_QUALITY_CUTOFF 0.0000001 // just > 0 so we don't get contours compared with themselves
+#define MAX_QUALITY_CUTOFF 0.09
+
+#define MAX_TRIES_FOR_ONE_CONTOUR 300
 
 //////////////////////////////////////
 //these are for adaptive thresholding
@@ -57,9 +64,10 @@ int main(int argc, char** argv){
   fprintf(stderr, "I'm going to use THRESHOLD edge_method '%i'\n", edge_method); 
 
 #if DEBUG
-  cvNamedWindow( "Original", 1);
-  cvShowImage( "Original", image_original );
-  cvNamedWindow( "Contours", 1 );
+  //cvNamedWindow( "Original", 1);
+  //cvShowImage( "Original", image_original );
+  //cvNamedWindow( "Contours", 1 );
+  //cvWaitKey(); 
 #endif
 
   int threshold = 60; // only used for regular (not adaptive) thresholding
@@ -68,8 +76,9 @@ int main(int argc, char** argv){
   // start manipulating image
   ////////////////////////////
   image_manip = cvCreateImage( cvGetSize( image_original ), 8, 1 );
-  image_bw_copy = cvCreateImage( cvGetSize( image_original ), 8, 1 );
-  image_bw_copy2 = cvCreateImage( cvGetSize( image_original ), 8, 1 );
+  // bw copy is what we'll extract contours from
+  image_bw_copy = cvCreateImage( cvGetSize( image_original ), 8, 1 ); 
+
   contour_storage1 = cvCreateMemStorage(0);
   contour_storage2 = cvCreateMemStorage(0);
   CvSeq* contours1 = NULL;
@@ -80,17 +89,15 @@ int main(int argc, char** argv){
   
   // make another b/w copy
   cvCvtColor( image_original, image_bw_copy, CV_BGR2GRAY );
-  cvCvtColor( image_original, image_bw_copy2, CV_BGR2GRAY );
   
   // make contour-ready image using thresholding or canny edge detection 
-  
   if( edge_method == 1 ){ // CANNY 
     cvCanny( image_manip, image_manip, 50, 900, 3 ); // these seem to exclude a lot of crap
   }
   else if( edge_method == 2 ){ // THRESHOLD
     cvThreshold( image_manip, image_manip, threshold, 255, THRESHOLD_TYPE );
   }
-  else if( edge_method == 3 ){
+  else if( edge_method == 3 ){ // ADAPTIVE THRESHOLD
     cvAdaptiveThreshold(image_manip, image_manip, 255, ADAPTIVE_METHOD, THRESHOLD_TYPE, BLOCK_SIZE, SUBTRACT_PARAM);
   }
   else {
@@ -99,8 +106,9 @@ int main(int argc, char** argv){
   }
     
 #if DEBUG
-  cvNamedWindow( "Thresholded", 1);
-  cvShowImage( "Thresholded", image_manip );
+  //cvNamedWindow( "Thresholded", 1);
+  //cvShowImage( "Thresholded", image_manip );
+  //cvWaitKey(); 
 #endif
   
   int numContoursFound = 0;
@@ -118,20 +126,26 @@ int main(int argc, char** argv){
   //
   /* make new big image to write out all contours to */
   //
-  // - make the each contour subimage x by x pixels, where x is the max of (width of the widest contour, length of the longest contour)
-  // - then make the big image 3 times x wide and x^2 
+  // - let the space in which we print each contour be X by X pixels, where X is the max of (width of the widest contour, length of the longest contour)
+  // - then make the big image 4 * X wide and X^2 long
 
   height_width_values max_x_y = get_max_x_y_for_contour_set( contours1, MIN_CONTOUR_PIXEL_SIZE, MAX_CONTOUR_PIXEL_SIZE  );
   int subimage_dimension = fmax( max_x_y.width, max_x_y.height); // "x" above
-  int num_rows = ( numContoursFound * numContoursFound / 2);
 
-  printf("max_x_y.count: %i\n", max_x_y.count);
+  int num_rows = ( max_x_y.count * max_x_y.count );
+  if ( num_rows > MAX_CONTOUR_COMPARISONS ){
+    num_rows = MAX_CONTOUR_COMPARISONS;
+  }
+
+  printf("num usable contours (max_x_y.count): %i\n", max_x_y.count);
   printf("num_rows: %i\n", num_rows);
   
   IplImage* mosaic_of_contours = cvCreateImage( 
 					       cvSize(
-						      (subimage_dimension * 4), // 4 places - one place for first contour, one for second contour and two for a score, to leave enough room
-						      (subimage_dimension * num_rows ) // height
+						      // width 4 places - one place for first contour, one for second contour and two for a score, to leave enough room
+						      (subimage_dimension * 4), 
+						      // height
+						      (subimage_dimension * num_rows ) 
 						      ), 
 					       8, 1);
   cvZero( mosaic_of_contours );
@@ -141,7 +155,7 @@ int main(int argc, char** argv){
     
 #if DEBUG
     fflush(stdout);
-    printf("row:\n", this_row);
+    printf("row: %i\n", this_row);
 #endif
     
     // get contour image
@@ -191,7 +205,6 @@ int main(int argc, char** argv){
 		   CV_CHAIN_APPROX_SIMPLE //CV_CHAIN_APPROX_SIMPLE //CV_CHAIN_CODE
 		    );
 
-    int inner_loop = 0;
     for( CvSeq* d=contours2; d != NULL; d = d->h_next ) {
 
       // get contour image
@@ -202,16 +215,23 @@ int main(int argc, char** argv){
       pt_lower_right2.y = bbs2.y;
       pt_upper_left2.x = pt_lower_right2.x + bbs2.width;
       pt_upper_left2.y = pt_lower_right2.y + bbs2.height;
-    
+
+      // skip contours that are too big or too small
       if  (bbs2.width < MIN_CONTOUR_PIXEL_SIZE || bbs2.height < MIN_CONTOUR_PIXEL_SIZE || bbs2.width > MAX_CONTOUR_PIXEL_SIZE || bbs2.height > MAX_CONTOUR_PIXEL_SIZE // too big or too small
 	   ){
 	//printf("rejected contour of size %i by %i\n", bbs2.width, bbs2.height);
 	continue;
       }
-    
+
       IplImage* extracted_contour2;
-      extracted_contour2 = CopySubImage( image_bw_copy2, bbs2.x, bbs2.y, bbs2.width, bbs2.height);
-    
+      extracted_contour2 = CopySubImage( image_bw_copy, bbs2.x, bbs2.y, bbs2.width, bbs2.height);
+
+      double match_val = pghMatchShapes(c, d);
+      // skip comparison if it's too bad 
+      if ( match_val >  MAX_QUALITY_CUTOFF || match_val < MIN_QUALITY_CUTOFF ){
+	continue;
+      }
+
       // now write to contour2 to mosaic
       CvRect ROIrect = cvRect(
 			      subimage_dimension,
@@ -224,11 +244,7 @@ int main(int argc, char** argv){
       cvResetImageROI( mosaic_of_contours );
       cvReleaseImage( &extracted_contour2 );
 
-      // printf("row: %i inner_loop: %i\n", this_row, inner_loop);
-
-      double match_val = pghMatchShapes(c, d);
-      /* add text */
-
+      /* write out score too */
       char match_val_string[10];
       sprintf (match_val_string, "%f", match_val);
 
@@ -236,10 +252,21 @@ int main(int argc, char** argv){
       cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.3, 0.3, 0, 1, CV_AA);
       cvPutText(mosaic_of_contours, match_val_string, cvPoint(2 * subimage_dimension + 2, this_row * subimage_dimension + 10), &font, cvScalar(255, 255, 255, 0));
 
+#if DEBUG
+      fflush(stdout);
+      printf("\t(inner loop) row: %i\n", this_row);
+#endif
+
       this_row++;
-      inner_loop++;
-      
+      if ( this_row > MAX_CONTOUR_COMPARISONS - 1){
+	break;
+      }
+
      }
+
+    if ( this_row > MAX_CONTOUR_COMPARISONS - 1){
+      break;
+    }
 
   }
 
